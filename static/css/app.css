@@ -1,0 +1,45 @@
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+
+.legend {
+    font-size: 16px;
+    font-weight: bold;
+    text-anchor: left;
+}
+
+.x-axis {
+    font-size: 10px;
+}
+.y-axis {
+    font-size: 10px;
+}
+.y-axis text{
+    text-anchor: end;
+}
+
+
+.col-center-block {
+    float: none;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+ th, td { white-space: nowrap; }
+    div.dataTables_wrapper {
+        margin: 0 auto;
+    }
+
+    div.container {
+        width: 80%;
+    }
+html{
+    -webkit-text-size-adjust:none;
+    -ms-text-size-adjust:none;
+}
+
+

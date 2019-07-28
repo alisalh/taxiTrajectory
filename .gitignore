@@ -1,0 +1,13 @@
+# Directory of my data
+data/
+
+#log
+.idea/
+
+#cache
+__pycache__/
+
+*.json
+*.pkl
+
+
