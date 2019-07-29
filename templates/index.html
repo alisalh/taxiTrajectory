@@ -81,8 +81,8 @@
             <div class="map-panel" id="map" ></div>
         </div>
         <div class="right-column">
-            <div class="row" style="margin-bottom: 5px;margin-left: 1px;">
-                <div class="dropdown">
+            <div class="row" style="display: flex; margin: 0 5px 5px 5px;">
+                <div class="dropdown" style="flex: 1;">
                     <label style="font-size: 14px">Sort by:</label>
                     <button class="btn btn-default btn-sm dropdown-toggle" id="sortmenu" type="button"
                             data-toggle="dropdown">Name
@@ -97,18 +97,15 @@
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#" style="font-size: 14px">Distance</a>
                         </li>
                     </ul>
-
-                    <div class="input-group input-group-sm" style="width:200px; float:right; padding-right: 15px">
-                        <input id='search_content' type="text" class="form-control" placeholder="Search for...">
-                        <span class="input-group-btn">
-                        <!--<button class="btn btn-default" type="button"> </button>-->
-                            <button id="searchbtn" type="button" class="btn btn-default btn-xs">
-                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                                </button>
-                      </span>
-                    </div>
                 </div>
-
+                <div class="input-group input-group-sm" style="flex: 1">
+                    <input id='search_content' type="text" class="form-control" placeholder="Search for...">
+                    <span class="input-group-btn">
+                        <button id="searchbtn" type="button" class="btn btn-default btn-xs">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                  </span>
+                </div>
             </div>
             <div class="row" style="overflow-y: scroll; overflow-x: hidden">
                 <div id="sub_traj_table" class="list-group">

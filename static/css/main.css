@@ -17,7 +17,7 @@
   flex: 0.8; 
   display: flex; 
   flex-direction: column; 
-  margin-right: 5px;
+  margin-right: 10px;
 }
 
 .center-column{
@@ -27,7 +27,7 @@
 
 .right-column{
   flex: 0.8; 
-  margin-right: 5px;
+  margin-right: 10px;
 }
 
 .control-panel{
@@ -67,7 +67,6 @@
   height: 18px;
   width: 18px;
 }
-
 .parameter{
   width: 45px;
   height: 25px;
