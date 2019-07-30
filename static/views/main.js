@@ -13,6 +13,7 @@ var topics = Array.apply(null, Array(num_topics)).map(function (_, i) {
     return 'Topic ' + (i + 1);
 });
 
+
 // the value of input changes as the slider 
 $("#min_support").slider().on("slide", function(){
     $("#min_support_input").val($("#min_support").slider('getValue'))});

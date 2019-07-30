@@ -60,7 +60,7 @@ def get_taxi_ids(db_path, table_name):
     return taxi_ids
 
 
-# Haversine(lon1, lat1, lon2, lat2)的参数代表：经度1，纬度1，经度2，纬度2（十进制度数）
+# Haversine(lon1, lat1, lon2, lat2)的参数代表：经度1，纬度1，经度2，纬度2（十进制度数）——————通过两个点的经纬度计算距离
 def Haversine(lon1, lat1, lon2, lat2):
     # 将十进制度数转化为弧度
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
