@@ -356,7 +356,7 @@ class Taxi_Server(object):
             sort_tuple = sorted(enumerate(self.topic_phrase_filter_list), key=lambda a: -a[1][2])
         if method == "distance":
             sort_tuple = sorted(enumerate(self.topic_phrase_filter_list), key=lambda a: -a[1][6])
-        if method == "sequence":
+        if method == "sequence length":
             sort_tuple = sorted(enumerate(self.topic_phrase_filter_list), key=lambda a: -a[1][5])
         sort_index = [i[0] for i in sort_tuple]
         return sort_index

@@ -28,7 +28,7 @@ function sortchange(event) {
     var x = $(this).text()+" <span class='caret'></span>"; //span is the arrow
     $(".dropdown button").html(x);  // show the selected text
      $.post('/sortphrase/', {"method": $(this).text()}, function (jsondata) {
-         create_sub_trajectory_table(table_data, jsondata.data.data);
+        create_sub_trajectory_table(table_data, jsondata.data.data);
      });
 }
 $(".dropdown-menu li a").on('click', sortchange);

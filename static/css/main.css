@@ -1,5 +1,6 @@
 html, body{
   height:100%;
+  overflow: hidden
 }
 
 .app{
@@ -29,6 +30,7 @@ html, body{
 .center-column{
   flex: 2;
   margin-right: 10px;
+  height: 100%;
 }
 
 .right-column{
@@ -80,4 +82,19 @@ html, body{
   margin-left: 40px;
   font-size: 13px;
 }
+
+.dataTables_wrapper .dataTables_info{
+  padding-top: 0.6em;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button{
+  padding-top: 0.2em;
+}
+/* table.dataTable thead th, table.dataTable thead td{
+  border-bottom: 1px solid #ddd;
+} */
+
+/* #sub_traj_table{
+  border-top:1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+} */
 

@@ -5,7 +5,8 @@ var bool_scatter_move_out_event = false;
 var bool_scatter_move_in_event = true;
 
 //draw map
-var height = 853; //window.innerHeight * 0.8368;
+var height = $("#map").parent().innerHeight();
+console.log(height)
 $("#map").height(height);
 var dom = document.getElementById("map");
 var selected_topics = [];
@@ -45,7 +46,7 @@ var bmap_option = {
                     start_time_span_option.series = time_dist_data_bk;
                     start_time_span_chart.setOption(start_time_span_option, true);
                     var time_speed_width = $("#time_speed_chart").parent().width();
-                    var seg_height = (time_speed_height - 40) / 2 / 8;
+                    var seg_height = (time_speed_height - 40) / 16;
                     time_speed_chart.segmentHeight(seg_height)
                         .innerRadius(seg_height).margin({
                         top: 20,
@@ -608,8 +609,16 @@ function renderBrushed(params) {
             $.post('/getdetailbyid/', {"id": JSON.stringify(new_brush_table_index_data)}, function (jsondata) {
                 var data = jsondata.data;
                 var start_time_span_data = data['start_time_span'];
-                var time_speed_data = data['time_speed'];
-
+                var old_time_speed_data = data['time_speed'];
+                var time_speed_data = []
+                 // 增加11pm到6am的speed数据
+                for(var i=0; i<old_time_speed_data.length; i++){
+                    if(i%18 === 0){
+                        for(var j=0; j<6; j++)
+                            time_speed_data.push(0);
+                    }
+                    time_speed_data.push(old_time_speed_data[i]);
+                }
                 start_time_span_option.series = start_time_span_data;
                 start_time_span_chart.setOption(start_time_span_option, true);
 
@@ -757,7 +766,7 @@ function create_table(table_data) {
     detail_table = $('#detail_table').DataTable({
         columns: [{title: 'Taxi ID'}, {title: 'PickUp_P'}, {title: 'DropOff_P'}, {title: 'PickUp_T'}, {title: 'DropOff_T'}, {title: 'Avg_Spd'}, {title: 'Max_Spd'}, {title: 'Min_Spd'}, {title: 'Dist'}],
         data: table_data,
-        scrollY: "200px",
+        scrollY: "150px",
         scrollCollapse: true,
         searching: false,
         pagingType: 'simple'
@@ -767,13 +776,23 @@ function create_table(table_data) {
 
 }
 var detail_table = null;
-$("#detail_table").height(window.innerHeight * 0.33);
+var detail_table_height = $("#detail_table").parent().innerHeight();
+$("#detail_table").height(detail_table_height);
 
 function update_detail_by_ids(data_ids, centre) {
     $.post('/getdetailbyid/', {"id": JSON.stringify(data_ids)}, function (jsondata) {
         var data = jsondata.data;
         var start_time_span_data = data['start_time_span'];
-        var time_speed_data = data['time_speed'];
+        var old_time_speed_data = data['time_speed'];
+        var time_speed_data = []
+         // 增加11pm到6am的speed数据
+         for(var i=0; i<old_time_speed_data.length; i++){
+            if(i%18 === 0){
+                for(var j=0; j<6; j++)
+                    time_speed_data.push(0);
+            }
+            time_speed_data.push(old_time_speed_data[i]);
+        }
         var table_data = data['table'];
 
         start_time_span_option.series = start_time_span_data;
