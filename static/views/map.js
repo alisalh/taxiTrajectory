@@ -290,7 +290,18 @@ function gettopicregiondist() {
         start_time_span_option.series = time_dist_data;
         start_time_span_chart.setOption(start_time_span_option, true);
         //////////////////////
-        var time_speed_data = jsondata.data.time_speed;
+        var old_time_speed_data = jsondata.data.time_speed;
+        var time_speed_data = []
+
+        // 增加11pm到6am的speed数据
+        for(var i=0; i<old_time_speed_data.length; i++){
+            if(i%18 === 0){
+                for(var j=0; j<6; j++)
+                    time_speed_data.push(0);
+            }
+            time_speed_data.push(old_time_speed_data[i]);
+        }
+
         var time_speed_width = $("#time_speed_chart").parent().width();
         var seg_height = (time_speed_height - 40) / 2 / 8;
         time_speed_chart.segmentHeight(seg_height)
@@ -339,7 +350,18 @@ function update_by_topics() {
         start_time_span_option.series = time_dist_data;
         start_time_span_chart.setOption(start_time_span_option, true);
         //////////////////////
-        var time_speed_data = jsondata.data.time_speed;
+        var old_time_speed_data = jsondata.data.time_speed;
+        var time_speed_data = []
+
+        // 增加11pm到6am的speed数据
+        for(var i=0; i<old_time_speed_data.length; i++){
+            if(i%18 === 0){
+                for(var j=0; j<6; j++)
+                    time_speed_data.push(0);
+            }
+            time_speed_data.push(old_time_speed_data[i]);
+        }
+        
         var time_speed_width = $("#time_speed_chart").parent().width();
         var seg_height = (time_speed_height - 40) / 2 / 8;
         time_speed_chart.segmentHeight(seg_height)
@@ -613,8 +635,9 @@ function renderBrushed(params) {
             start_time_span_option.series = time_dist_data_bk;
             start_time_span_chart.setOption(start_time_span_option, true);
             //////////////////////
+            // draw circular heat chart
             var time_speed_width = $("#time_speed_chart").parent().width();
-            var seg_height = (time_speed_height - 40) / 2 / 8;
+            var seg_height = (time_speed_height - 40) / 16;
             time_speed_chart.segmentHeight(seg_height)
                 .innerRadius(seg_height).margin({
                 top: 20,
@@ -636,11 +659,11 @@ function renderBrushed(params) {
 }
 
 var time_speed_chart = circularHeatChart()
-    .numSegments(18)
+    .numSegments(24)
     .range(["#1a9641", "#a6d96a", "#ffffbf", "#fdae61", "#d7191c"])
     .radialLabels(["0-9", "10-19", "20-29", "30-39", "40-49", "50-59", ">60"])
-    .segmentLabels(["6am", "7am", "8am", "9am", "10am", "11am",
-        "12am", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm", "11pm"]);
+    .segmentLabels(["0", '1', '2', '3', '4', '5', "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" ]);
+
 var sub_traj_height = height * 0.303;
 $("#sub_traj_table").parent().height(sub_traj_height);
 function create_sub_trajectory_table(table_data, sort_index) {
