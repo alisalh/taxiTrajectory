@@ -6,7 +6,6 @@ var bool_scatter_move_in_event = true;
 
 //draw map
 var height = $("#map").parent().innerHeight();
-console.log(height)
 $("#map").height(height);
 var dom = document.getElementById("map");
 var selected_topics = [];
@@ -43,22 +42,23 @@ var bmap_option = {
                     bool_scatter_move_in_event = true;
                     map_id = map_coords.length-1;
                     detail_ids = [];
-                    start_time_span_option.series = time_dist_data_bk;
-                    start_time_span_chart.setOption(start_time_span_option, true);
-                    var time_speed_width = $("#time_speed_chart").parent().width();
-                    var seg_height = (time_speed_height - 40) / 16;
-                    time_speed_chart.segmentHeight(seg_height)
-                        .innerRadius(seg_height).margin({
-                        top: 20,
-                        right: time_speed_width / 2 - seg_height * 8,
-                        bottom: 20,
-                        left: time_speed_width / 2 - seg_height * 8
-                    });
-                    d3.select("#time_speed_chart").selectAll("svg").remove();
-                    d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data_bk])
-                        .enter()
-                        .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-                        .call(time_speed_chart);
+                    drawDistAndSpeed(time_dist_data_bk, time_speed_data_bk)
+                    // start_time_span_option.series = time_dist_data_bk;
+                    // start_time_span_chart.setOption(start_time_span_option, true);
+                    // var time_speed_width = $("#time_speed_chart").parent().width();
+                    // var seg_height = (time_speed_height - 40) / 16;
+                    // time_speed_chart.segmentHeight(seg_height)
+                    //     .innerRadius(seg_height).margin({
+                    //     top: 20,
+                    //     right: time_speed_width / 2 - seg_height * 8,
+                    //     bottom: 20,
+                    //     left: time_speed_width / 2 - seg_height * 8
+                    // });
+                    // d3.select("#time_speed_chart").selectAll("svg").remove();
+                    // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data_bk])
+                    //     .enter()
+                    //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
+                    //     .call(time_speed_chart);
                 }
             }
         }
@@ -288,8 +288,8 @@ function gettopicregiondist() {
         table_data = topic_phrase_data;
         //////////////////////
         var time_dist_data = jsondata.data.time_dist;
-        start_time_span_option.series = time_dist_data;
-        start_time_span_chart.setOption(start_time_span_option, true);
+        // start_time_span_option.series = time_dist_data;
+        // start_time_span_chart.setOption(start_time_span_option, true);
         //////////////////////
         var old_time_speed_data = jsondata.data.time_speed;
         var time_speed_data = []
@@ -302,21 +302,21 @@ function gettopicregiondist() {
             }
             time_speed_data.push(old_time_speed_data[i]);
         }
-
-        var time_speed_width = $("#time_speed_chart").parent().width();
-        var seg_height = (time_speed_height - 40) / 2 / 8;
-        time_speed_chart.segmentHeight(seg_height)
-            .innerRadius(seg_height).margin({
-            top: 20,
-            right: time_speed_width / 2 - seg_height * 8,
-            bottom: 20,
-            left: time_speed_width / 2 - seg_height * 8
-        });
-        d3.select("#time_speed_chart").selectAll("svg").remove();
-        d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
-            .enter()
-            .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-            .call(time_speed_chart);
+        drawDistAndSpeed(time_dist_data, time_speed_data)
+        // var time_speed_width = $("#time_speed_chart").parent().width();
+        // var seg_height = (time_speed_height - 40) / 2 / 8;
+        // time_speed_chart.segmentHeight(seg_height)
+        //     .innerRadius(seg_height).margin({
+        //     top: 20,
+        //     right: time_speed_width / 2 - seg_height * 8,
+        //     bottom: 20,
+        //     left: time_speed_width / 2 - seg_height * 8
+        // });
+        // d3.select("#time_speed_chart").selectAll("svg").remove();
+        // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
+        //     .enter()
+        //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
+        //     .call(time_speed_chart);
         time_dist_data_bk = time_dist_data;
         time_speed_data_bk = time_speed_data;
         /////////////////////
@@ -348,8 +348,8 @@ function update_by_topics() {
         //////////
         //////////////////////
         var time_dist_data = jsondata.data.time_dist;
-        start_time_span_option.series = time_dist_data;
-        start_time_span_chart.setOption(start_time_span_option, true);
+        // start_time_span_option.series = time_dist_data;
+        // start_time_span_chart.setOption(start_time_span_option, true);
         //////////////////////
         var old_time_speed_data = jsondata.data.time_speed;
         var time_speed_data = []
@@ -362,21 +362,21 @@ function update_by_topics() {
             }
             time_speed_data.push(old_time_speed_data[i]);
         }
-        
-        var time_speed_width = $("#time_speed_chart").parent().width();
-        var seg_height = (time_speed_height - 40) / 2 / 8;
-        time_speed_chart.segmentHeight(seg_height)
-            .innerRadius(seg_height).margin({
-            top: 20,
-            right: time_speed_width / 2 - seg_height * 8,
-            bottom: 20,
-            left: time_speed_width / 2 - seg_height * 8
-        });
-        d3.select("#time_speed_chart").selectAll("svg").remove();
-        d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
-            .enter()
-            .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-            .call(time_speed_chart);
+        drawDistAndSpeed(time_dist_data, time_speed_data)
+        // var time_speed_width = $("#time_speed_chart").parent().width();
+        // var seg_height = (time_speed_height - 40) / 2 / 8;
+        // time_speed_chart.segmentHeight(seg_height)
+        //     .innerRadius(seg_height).margin({
+        //     top: 20,
+        //     right: time_speed_width / 2 - seg_height * 8,
+        //     bottom: 20,
+        //     left: time_speed_width / 2 - seg_height * 8
+        // });
+        // d3.select("#time_speed_chart").selectAll("svg").remove();
+        // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
+        //     .enter()
+        //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
+        //     .call(time_speed_chart);
         time_dist_data_bk = time_dist_data;
         time_speed_data_bk = time_speed_data;
         /////////////////////
@@ -436,31 +436,31 @@ function mapBrushSelected (params) {
 }
 
 // draw distance distribution
-var start_time_span_option = {
-    legend: {
-        data: ['0-10km', '10-20km', '20-30km', '>30km']
-    },
-    grid: {
-        left: 0,
-        top: 30,
-        right: 0,
-        bottom: 15,
-        containLabel: true
-    },
-    xAxis: {
-        type: 'category',
-        data: ['6-8am', '9-11am', '12-2pm', '3-5pm', '6-8pm', '9-11pm']
-    },
-    yAxis: {
-        type: 'value'
-    }
-};
+// var start_time_span_option = {
+//     legend: {
+//         data: ['0-10km', '10-20km', '20-30km', '>30km']
+//     },
+//     grid: {
+//         left: 0,
+//         top: 30,
+//         right: 0,
+//         bottom: 15,
+//         containLabel: true
+//     },
+//     xAxis: {
+//         type: 'category',
+//         data: ['6-8am', '9-11am', '12-2pm', '3-5pm', '6-8pm', '9-11pm']
+//     },
+//     yAxis: {
+//         type: 'value'
+//     }
+// };
 
-var start_time_span_height = height*0.279+7;
-$("#start_time_span_bar").height(start_time_span_height);
-var start_time_span_dom = document.getElementById("start_time_span_bar");
-var start_time_span_chart = echarts.init(start_time_span_dom);
-start_time_span_chart.setOption(start_time_span_option);
+// var start_time_span_height = height*0.279+7;
+// $("#start_time_span_bar").height(start_time_span_height);
+// var start_time_span_dom = document.getElementById("start_time_span_bar");
+// var start_time_span_chart = echarts.init(start_time_span_dom);
+// start_time_span_chart.setOption(start_time_span_option);
 
 
 function hexToRgb(hex) {
@@ -619,46 +619,49 @@ function renderBrushed(params) {
                     }
                     time_speed_data.push(old_time_speed_data[i]);
                 }
-                start_time_span_option.series = start_time_span_data;
-                start_time_span_chart.setOption(start_time_span_option, true);
+
+                drawDistAndSpeed(time_dist_data, time_speed_data)
+                // start_time_span_option.series = start_time_span_data;
+                // start_time_span_chart.setOption(start_time_span_option, true);
 
                 //////////////////////
-                var time_speed_width = $("#time_speed_chart").parent().width();
-                var seg_height = (time_speed_height - 40) / 2 / 8;
-                time_speed_chart.segmentHeight(seg_height)
-                    .innerRadius(seg_height).margin({
-                    top: 20,
-                    right: time_speed_width / 2 - seg_height * 8,
-                    bottom: 20,
-                    left: time_speed_width / 2 - seg_height * 8
-                });
-                d3.select("#time_speed_chart").selectAll("svg").remove();
-                d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
-                    .enter()
-                    .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-                    .call(time_speed_chart);
+                // var time_speed_width = $("#time_speed_chart").parent().width();
+                // var seg_height = (time_speed_height - 40) / 2 / 8;
+                // time_speed_chart.segmentHeight(seg_height)
+                //     .innerRadius(seg_height).margin({
+                //     top: 20,
+                //     right: time_speed_width / 2 - seg_height * 8,
+                //     bottom: 20,
+                //     left: time_speed_width / 2 - seg_height * 8
+                // });
+                // d3.select("#time_speed_chart").selectAll("svg").remove();
+                // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
+                //     .enter()
+                //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
+                //     .call(time_speed_chart);
                 /////////////////////
             });
         }else{
+            drawDistAndSpeed(time_dist_data_bk, time_speed_data_bk)
              ////////////////////
-            start_time_span_option.series = time_dist_data_bk;
-            start_time_span_chart.setOption(start_time_span_option, true);
+            // start_time_span_option.series = time_dist_data_bk;
+            // start_time_span_chart.setOption(start_time_span_option, true);
             //////////////////////
             // draw circular heat chart
-            var time_speed_width = $("#time_speed_chart").parent().width();
-            var seg_height = (time_speed_height - 40) / 16;
-            time_speed_chart.segmentHeight(seg_height)
-                .innerRadius(seg_height).margin({
-                top: 20,
-                right: time_speed_width / 2 - seg_height * 8,
-                bottom: 20,
-                left: time_speed_width / 2 - seg_height * 8
-            });
-            d3.select("#time_speed_chart").selectAll("svg").remove();
-            d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data_bk])
-                .enter()
-                .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-                .call(time_speed_chart);
+            // var time_speed_width = $("#time_speed_chart").parent().width();
+            // var seg_height = (time_speed_height - 40) / 16;
+            // time_speed_chart.segmentHeight(seg_height)
+            //     .innerRadius(seg_height).margin({
+            //     top: 20,
+            //     right: time_speed_width / 2 - seg_height * 8,
+            //     bottom: 20,
+            //     left: time_speed_width / 2 - seg_height * 8
+            // });
+            // d3.select("#time_speed_chart").selectAll("svg").remove();
+            // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data_bk])
+            //     .enter()
+            //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
+            //     .call(time_speed_chart);
         }
 
         mapchart.setOption(map_option, true);
@@ -783,8 +786,8 @@ function update_detail_by_ids(data_ids, centre) {
     $.post('/getdetailbyid/', {"id": JSON.stringify(data_ids)}, function (jsondata) {
         var data = jsondata.data;
         var start_time_span_data = data['start_time_span'];
-        var old_time_speed_data = data['time_speed'];
-        var time_speed_data = []
+        var old_time_speed_data = data['time_speed']; 
+        var time_speed_data = [];
          // 增加11pm到6am的speed数据
          for(var i=0; i<old_time_speed_data.length; i++){
             if(i%18 === 0){
@@ -794,9 +797,9 @@ function update_detail_by_ids(data_ids, centre) {
             time_speed_data.push(old_time_speed_data[i]);
         }
         var table_data = data['table'];
-
-        start_time_span_option.series = start_time_span_data;
-        start_time_span_chart.setOption(start_time_span_option, true);
+        drawDistAndSpeed(start_time_span_data, time_speed_data)
+        // start_time_span_option.series = start_time_span_data;
+        // start_time_span_chart.setOption(start_time_span_option, true);
 
         var lines_data = data['docs'];
         var ext_lines = [];
@@ -822,20 +825,20 @@ function update_detail_by_ids(data_ids, centre) {
         mapchart.setOption(map_option, true);
 
         //////////////////////
-        var time_speed_width = $("#time_speed_chart").parent().width();
-        var seg_height = (time_speed_height - 40) / 2 / 8;
-        time_speed_chart.segmentHeight(seg_height)
-            .innerRadius(seg_height).margin({
-            top: 20,
-            right: time_speed_width / 2 - seg_height * 8,
-            bottom: 20,
-            left: time_speed_width / 2 - seg_height * 8
-        });
-        d3.select("#time_speed_chart").selectAll("svg").remove();
-        d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
-            .enter()
-            .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-            .call(time_speed_chart);
+        // var time_speed_width = $("#time_speed_chart").parent().width();
+        // var seg_height = (time_speed_height - 40) / 2 / 8;
+        // time_speed_chart.segmentHeight(seg_height)
+        //     .innerRadius(seg_height).margin({
+        //     top: 20,
+        //     right: time_speed_width / 2 - seg_height * 8,
+        //     bottom: 20,
+        //     left: time_speed_width / 2 - seg_height * 8
+        // });
+        // d3.select("#time_speed_chart").selectAll("svg").remove();
+        // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
+        //     .enter()
+        //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
+        //     .call(time_speed_chart);
         /////////////////////
         create_table(table_data);
         //////////////////////
@@ -896,3 +899,37 @@ mapchart.on('mouseout', function(params){
         phrase_embedding_chart.setOption(phrase_embedding_option, true);
     })
 })
+
+function drawDistAndSpeed(dist_data, speed_data){
+    var svgHeight = height*0.3
+    var svgWidth = $("#time_speed_chart").parent().width();
+    d3.select("#time_speed_chart").selectAll("svg").remove();
+    var chartSvg = d3.select('#time_speed_chart').append('svg')
+        .attr('width', svgWidth).attr('height', svgHeight)
+
+    var color = d3.scaleSequential(d3.interpolateRdYlGn);
+    var max = Math.max(...speed_data)
+
+    var arc = d3.arc()
+    var innerR = 20, outerR = 35
+    for(var j=0; j<7; j++){
+        var speedG = chartSvg.append('g').attr('transform', 
+            'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+        arc.innerRadius(innerR).outerRadius(outerR)
+        var arcs = d3.pie()(new Array(24).fill(1))
+        var data = speed_data.slice(j*24, (j+1)*24)
+        speedG.selectAll('path')
+            .data(arcs).enter().append('path')
+            .style('fill', function(d, i){
+                if(i>=0 && i<=5) return '#e0e0e0'
+                else{
+                    //范围映射到[0.1,0.9], 颜色为红到绿
+                    var value = 0.1 + (0.9-0.1)/max*speed_data[j*24+i]
+                    return color(1-value)
+                }
+            })
+            .attr('d', arc)
+        innerR = outerR
+        outerR = outerR + 15
+    }
+}
