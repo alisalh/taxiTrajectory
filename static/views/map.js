@@ -43,22 +43,6 @@ var bmap_option = {
                     map_id = map_coords.length-1;
                     detail_ids = [];
                     drawDistAndSpeed(time_dist_data_bk, time_speed_data_bk)
-                    // start_time_span_option.series = time_dist_data_bk;
-                    // start_time_span_chart.setOption(start_time_span_option, true);
-                    // var time_speed_width = $("#time_speed_chart").parent().width();
-                    // var seg_height = (time_speed_height - 40) / 16;
-                    // time_speed_chart.segmentHeight(seg_height)
-                    //     .innerRadius(seg_height).margin({
-                    //     top: 20,
-                    //     right: time_speed_width / 2 - seg_height * 8,
-                    //     bottom: 20,
-                    //     left: time_speed_width / 2 - seg_height * 8
-                    // });
-                    // d3.select("#time_speed_chart").selectAll("svg").remove();
-                    // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data_bk])
-                    //     .enter()
-                    //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-                    //     .call(time_speed_chart);
                 }
             }
         }
@@ -288,9 +272,6 @@ function gettopicregiondist() {
         table_data = topic_phrase_data;
         //////////////////////
         var time_dist_data = jsondata.data.time_dist;
-        // start_time_span_option.series = time_dist_data;
-        // start_time_span_chart.setOption(start_time_span_option, true);
-        //////////////////////
         var old_time_speed_data = jsondata.data.time_speed;
         var time_speed_data = []
 
@@ -303,20 +284,7 @@ function gettopicregiondist() {
             time_speed_data.push(old_time_speed_data[i]);
         }
         drawDistAndSpeed(time_dist_data, time_speed_data)
-        // var time_speed_width = $("#time_speed_chart").parent().width();
-        // var seg_height = (time_speed_height - 40) / 2 / 8;
-        // time_speed_chart.segmentHeight(seg_height)
-        //     .innerRadius(seg_height).margin({
-        //     top: 20,
-        //     right: time_speed_width / 2 - seg_height * 8,
-        //     bottom: 20,
-        //     left: time_speed_width / 2 - seg_height * 8
-        // });
-        // d3.select("#time_speed_chart").selectAll("svg").remove();
-        // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
-        //     .enter()
-        //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-        //     .call(time_speed_chart);
+
         time_dist_data_bk = time_dist_data;
         time_speed_data_bk = time_speed_data;
         /////////////////////
@@ -348,9 +316,6 @@ function update_by_topics() {
         //////////
         //////////////////////
         var time_dist_data = jsondata.data.time_dist;
-        // start_time_span_option.series = time_dist_data;
-        // start_time_span_chart.setOption(start_time_span_option, true);
-        //////////////////////
         var old_time_speed_data = jsondata.data.time_speed;
         var time_speed_data = []
 
@@ -363,20 +328,7 @@ function update_by_topics() {
             time_speed_data.push(old_time_speed_data[i]);
         }
         drawDistAndSpeed(time_dist_data, time_speed_data)
-        // var time_speed_width = $("#time_speed_chart").parent().width();
-        // var seg_height = (time_speed_height - 40) / 2 / 8;
-        // time_speed_chart.segmentHeight(seg_height)
-        //     .innerRadius(seg_height).margin({
-        //     top: 20,
-        //     right: time_speed_width / 2 - seg_height * 8,
-        //     bottom: 20,
-        //     left: time_speed_width / 2 - seg_height * 8
-        // });
-        // d3.select("#time_speed_chart").selectAll("svg").remove();
-        // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
-        //     .enter()
-        //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-        //     .call(time_speed_chart);
+
         time_dist_data_bk = time_dist_data;
         time_speed_data_bk = time_speed_data;
         /////////////////////
@@ -434,34 +386,6 @@ function mapBrushSelected (params) {
     phrase_embedding_chart.setOption(phrase_embedding_option, true);
     create_sub_trajectory_table(table_data, new_brush_tabel_index_data);
 }
-
-// draw distance distribution
-// var start_time_span_option = {
-//     legend: {
-//         data: ['0-10km', '10-20km', '20-30km', '>30km']
-//     },
-//     grid: {
-//         left: 0,
-//         top: 30,
-//         right: 0,
-//         bottom: 15,
-//         containLabel: true
-//     },
-//     xAxis: {
-//         type: 'category',
-//         data: ['6-8am', '9-11am', '12-2pm', '3-5pm', '6-8pm', '9-11pm']
-//     },
-//     yAxis: {
-//         type: 'value'
-//     }
-// };
-
-// var start_time_span_height = height*0.279+7;
-// $("#start_time_span_bar").height(start_time_span_height);
-// var start_time_span_dom = document.getElementById("start_time_span_bar");
-// var start_time_span_chart = echarts.init(start_time_span_dom);
-// start_time_span_chart.setOption(start_time_span_option);
-
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -619,49 +543,10 @@ function renderBrushed(params) {
                     }
                     time_speed_data.push(old_time_speed_data[i]);
                 }
-
                 drawDistAndSpeed(time_dist_data, time_speed_data)
-                // start_time_span_option.series = start_time_span_data;
-                // start_time_span_chart.setOption(start_time_span_option, true);
-
-                //////////////////////
-                // var time_speed_width = $("#time_speed_chart").parent().width();
-                // var seg_height = (time_speed_height - 40) / 2 / 8;
-                // time_speed_chart.segmentHeight(seg_height)
-                //     .innerRadius(seg_height).margin({
-                //     top: 20,
-                //     right: time_speed_width / 2 - seg_height * 8,
-                //     bottom: 20,
-                //     left: time_speed_width / 2 - seg_height * 8
-                // });
-                // d3.select("#time_speed_chart").selectAll("svg").remove();
-                // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
-                //     .enter()
-                //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-                //     .call(time_speed_chart);
-                /////////////////////
             });
         }else{
             drawDistAndSpeed(time_dist_data_bk, time_speed_data_bk)
-             ////////////////////
-            // start_time_span_option.series = time_dist_data_bk;
-            // start_time_span_chart.setOption(start_time_span_option, true);
-            //////////////////////
-            // draw circular heat chart
-            // var time_speed_width = $("#time_speed_chart").parent().width();
-            // var seg_height = (time_speed_height - 40) / 16;
-            // time_speed_chart.segmentHeight(seg_height)
-            //     .innerRadius(seg_height).margin({
-            //     top: 20,
-            //     right: time_speed_width / 2 - seg_height * 8,
-            //     bottom: 20,
-            //     left: time_speed_width / 2 - seg_height * 8
-            // });
-            // d3.select("#time_speed_chart").selectAll("svg").remove();
-            // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data_bk])
-            //     .enter()
-            //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-            //     .call(time_speed_chart);
         }
 
         mapchart.setOption(map_option, true);
@@ -676,7 +561,7 @@ var time_speed_chart = circularHeatChart()
     .radialLabels(["0-9", "10-19", "20-29", "30-39", "40-49", "50-59", ">60"])
     .segmentLabels(["0", '1', '2', '3', '4', '5', "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" ]);
 
-var sub_traj_height = height * 0.303;
+var sub_traj_height = height * 0.5;
 $("#sub_traj_table").parent().height(sub_traj_height);
 function create_sub_trajectory_table(table_data, sort_index) {
     $("#sub_traj_table").children().remove();
@@ -798,8 +683,6 @@ function update_detail_by_ids(data_ids, centre) {
         }
         var table_data = data['table'];
         drawDistAndSpeed(start_time_span_data, time_speed_data)
-        // start_time_span_option.series = start_time_span_data;
-        // start_time_span_chart.setOption(start_time_span_option, true);
 
         var lines_data = data['docs'];
         var ext_lines = [];
@@ -824,22 +707,6 @@ function update_detail_by_ids(data_ids, centre) {
         map_option.series[1].data = ext_lines;
         mapchart.setOption(map_option, true);
 
-        //////////////////////
-        // var time_speed_width = $("#time_speed_chart").parent().width();
-        // var seg_height = (time_speed_height - 40) / 2 / 8;
-        // time_speed_chart.segmentHeight(seg_height)
-        //     .innerRadius(seg_height).margin({
-        //     top: 20,
-        //     right: time_speed_width / 2 - seg_height * 8,
-        //     bottom: 20,
-        //     left: time_speed_width / 2 - seg_height * 8
-        // });
-        // d3.select("#time_speed_chart").selectAll("svg").remove();
-        // d3.select("#time_speed_chart").selectAll("svg").data([time_speed_data])
-        //     .enter()
-        //     .append('svg').attr("height", time_speed_height).attr("width", time_speed_width)
-        //     .call(time_speed_chart);
-        /////////////////////
         create_table(table_data);
         //////////////////////
 
@@ -901,23 +768,22 @@ mapchart.on('mouseout', function(params){
 })
 
 function drawDistAndSpeed(dist_data, speed_data){
-    var svgHeight = height*0.3
+    var svgHeight = height*0.5
     var svgWidth = $("#time_speed_chart").parent().width();
     d3.select("#time_speed_chart").selectAll("svg").remove();
     var chartSvg = d3.select('#time_speed_chart').append('svg')
         .attr('width', svgWidth).attr('height', svgHeight)
 
+    // draw circular heat map
     var color = d3.scaleSequential(d3.interpolateRdYlGn);
     var max = Math.max(...speed_data)
-
-    var arc = d3.arc()
+    var arc_speed = d3.arc()
     var innerR = 20, outerR = 35
     for(var j=0; j<7; j++){
         var speedG = chartSvg.append('g').attr('transform', 
             'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
-        arc.innerRadius(innerR).outerRadius(outerR)
+        arc_speed.innerRadius(innerR).outerRadius(outerR)
         var arcs = d3.pie()(new Array(24).fill(1))
-        var data = speed_data.slice(j*24, (j+1)*24)
         speedG.selectAll('path')
             .data(arcs).enter().append('path')
             .style('fill', function(d, i){
@@ -928,8 +794,73 @@ function drawDistAndSpeed(dist_data, speed_data){
                     return color(1-value)
                 }
             })
-            .attr('d', arc)
+            .attr('d', arc_speed)
         innerR = outerR
         outerR = outerR + 15
     }
+    
+    // draw stacked bar
+    // var dist = []
+    // for(var i=0; i<dist_data.length; i++){
+    //     for(var j=0; j<dist_data[i].data.length; j++){
+    //         dist.push({
+    //             id: i,
+    //             name: dist_data[i].name,
+    //             time: j,
+    //             value: dist_data[i].data[j]
+    //         })
+    //     }  
+    // }
+    var keys = ['0-10km', '10-20km', '20-30km', '>30km'],
+        stack = d3.stack().keys(keys);
+    var dist = [{}, {}, {}, {}, {}, {}]
+    for(var i=0; i<dist_data.length; i++){
+        for(var j=0; j<dist_data[i].data.length; j++){
+            dist[j][keys[i]] = dist_data[i].data[j]
+        }  
+    }
+    let series = stack(dist)
+    var barG = chartSvg.append('g').attr('transform', 
+        'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+    var offset_group = 2*Math.PI / 24 * 3,
+        offest_inner = offset_group / 4,
+        offset_initial = offset_group * 2;
+    innerR = innerR + 20;
+    var color = ['#8dd3c7','#ffffb3','#bebada','#fb8072']
+    // var arc_dist = d3.arc()
+    //     .startAngle(function(d){ return offset_initial + d.time * offset_group + d.id*offest_inner})
+    //     .endAngle(function(d){ return offset_initial + d.time * offset_group + (d.id +1)*offest_inner})
+    //     .innerRadius(innerR)
+    //     .outerRadius(function(d){ return innerR + Math.pow(d.value, 2/5)})
+    var maxVal = d3.max(series[series.length - 1], d => d[1])
+    var y = d3.scaleLinear()
+    .range([innerR, innerR+30]).domain([0, maxVal])
+    var arc_dist = d3.arc()
+        .startAngle(function(d, i){ return offset_initial + i * offset_group})
+        .endAngle(function(d, i){ return offset_initial + (i+1) * offset_group})
+        .innerRadius(function(d){ return y(d[0]) })
+        .outerRadius(function(d){ return y(d[1]) })
+
+    var seriesG = barG.selectAll('g').data(series)
+        .enter().append('g')
+        .attr('fill', function(d, i){
+            return color[i]
+        })
+    seriesG.selectAll('g').data(d => d).enter().append('path').attr('d', arc_dist)
+    
+    
+    
+    // add text
+    var textG = chartSvg.append('g').attr('transform', 
+        'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+    var arc_text = d3.arc()
+        .innerRadius(outerR-15)
+        .outerRadius(innerR)
+    var arcs = d3.pie()(new Array(8).fill(1))
+    textG.selectAll('path')
+            .data(arcs).enter().append('path')
+            .style('fill', 'white')
+            .attr('d', arc_text)
+            .attr('stroke', 'grey')
+    
 }
