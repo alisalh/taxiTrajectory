@@ -7,6 +7,7 @@ var bool_scatter_move_in_event = true;
 //draw map
 var height = $("#map").parent().innerHeight();
 $("#map").height(height);
+var wrapper_height = $(".right-column-wrapper").innerHeight();
 var dom = document.getElementById("map");
 var selected_topics = [];
 var mapchart = echarts.init(dom);
@@ -561,7 +562,7 @@ var time_speed_chart = circularHeatChart()
     .radialLabels(["0-9", "10-19", "20-29", "30-39", "40-49", "50-59", ">60"])
     .segmentLabels(["0", '1', '2', '3', '4', '5', "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" ]);
 
-var sub_traj_height = height * 0.5;
+var sub_traj_height = wrapper_height * 0.5;
 $("#sub_traj_table").parent().height(sub_traj_height);
 function create_sub_trajectory_table(table_data, sort_index) {
     $("#sub_traj_table").children().remove();
@@ -768,14 +769,13 @@ mapchart.on('mouseout', function(params){
 })
 
 function drawDistAndSpeed(dist_data, speed_data){
-    var svgHeight = height*0.5
+    var svgHeight = wrapper_height*0.55
     var svgWidth = $("#time_speed_chart").parent().width();
     d3.select("#time_speed_chart").selectAll("svg").remove();
     var chartSvg = d3.select('#time_speed_chart').append('svg')
         .attr('width', svgWidth).attr('height', svgHeight)
-
     // draw circular heat map
-    var color = d3.scaleSequential(d3.interpolateRdYlGn);
+    var color = d3.scaleSequential(d3.interpolateGreens);
     var max = Math.max(...speed_data)
     var arc_speed = d3.arc()
     var innerR = 20, outerR = 35
@@ -789,9 +789,9 @@ function drawDistAndSpeed(dist_data, speed_data){
             .style('fill', function(d, i){
                 if(i>=0 && i<=5) return '#e0e0e0'
                 else{
-                    //范围映射到[0.1,0.9], 颜色为红到绿
-                    var value = 0.1 + (0.9-0.1)/max*speed_data[j*24+i]
-                    return color(1-value)
+                    //范围映射到[0.1,0.9]
+                    var value = 0.2 + (0.9-0.2)/max*speed_data[j*24+i]
+                    return color(value)
                 }
             })
             .attr('d', arc_speed)
@@ -834,7 +834,7 @@ function drawDistAndSpeed(dist_data, speed_data){
     //     .outerRadius(function(d){ return innerR + Math.pow(d.value, 2/5)})
     var maxVal = d3.max(series[series.length - 1], d => d[1])
     var y = d3.scaleLinear()
-    .range([innerR, innerR+30]).domain([0, maxVal])
+    .range([innerR, innerR+40]).domain([0, maxVal])
     var arc_dist = d3.arc()
         .startAngle(function(d, i){ return offset_initial + i * offset_group})
         .endAngle(function(d, i){ return offset_initial + (i+1) * offset_group})
@@ -848,19 +848,57 @@ function drawDistAndSpeed(dist_data, speed_data){
         })
     seriesG.selectAll('g').data(d => d).enter().append('path').attr('d', arc_dist)
     
-    
-    
-    // add text
-    var textG = chartSvg.append('g').attr('transform', 
+    // add text and split
+    var splitG = chartSvg.append('g').attr('transform', 
         'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
-    var arc_text = d3.arc()
+    var arc = d3.arc()
         .innerRadius(outerR-15)
         .outerRadius(innerR)
-    var arcs = d3.pie()(new Array(8).fill(1))
+    var arcs_split = d3.pie()(new Array(8).fill(1))
+    splitG.selectAll('path')
+            .data(arcs_split).enter().append('path')
+            .style('fill', 'none')
+            .attr('d', arc)
+            .attr('stroke', '#d9d9d9')
+
+    var time = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24']
+    var textG = chartSvg.append('g').attr('transform', 
+        'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+    var arcs_text = d3.pie()(new Array(24).fill(1))
     textG.selectAll('path')
-            .data(arcs).enter().append('path')
-            .style('fill', 'white')
-            .attr('d', arc_text)
-            .attr('stroke', 'grey')
+        .data(arcs_text).enter().append('path')
+        .attr('id', function(d, i){ return 'text-node-'+i})
+        .attr('d', arc)
+        .style('fill', 'none')
+    textG.selectAll('text')
+        .data(time).enter().append('text')
+        .style('font-size', 12+'px')
+        .attr("dy", 15)
+        .attr('x', 5)
+        .append('textPath')
+        .attr('xlink:href', function(d, i) { return '#text-node-'+i })
+        .text(function(d){ return d }) 
     
+    // add the mark text
+    var mark = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '>60']
+    innerR = 20, outerR = 35
+    for(var i=0; i<7; i++){
+        var markG = chartSvg.append('g').attr('transform', 
+            'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+        var arc_mark = d3.arc().innerRadius(innerR).outerRadius(outerR)
+            .startAngle(0).endAngle(offset_initial)
+        markG.append('path')
+            .attr('id', 'mark-node-'+i)
+            .attr('d', arc_mark)
+            .attr('fill', 'none')
+        markG.append('text')
+            .style('font-size', 12+'px')
+            .attr("dy", 15)
+            .attr('x', 5)
+            .append('textPath')
+            .attr('xlink:href', '#mark-node-'+i)
+            .text(mark[i]) 
+        innerR = outerR
+        outerR = outerR + 15
+    }       
 }

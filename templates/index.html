@@ -81,7 +81,7 @@
             <div class="map-panel" id="map" ></div>
         </div>
         <div class="right-column">
-            <div class="row" style="display: flex; margin: 0 5px 5px 5px;">
+            <div class='search-wrapper' style="display: flex; margin: 0 5px 5px 5px;">
                 <div class="dropdown" style="flex: 1;">
                     <label style="font-size: 14px">Sort by:</label>
                     <button class="btn btn-default btn-sm dropdown-toggle" id="sortmenu" type="button"
@@ -106,13 +106,16 @@
                   </span>
                 </div>
             </div>
-            <div class="row" style="overflow-y: scroll; overflow-x: hidden; padding-left: 10px; margin-bottom: 10px">
-                <div id="sub_traj_table" class="list-group">
+            <div class='right-column-wrapper'>
+                <div class="row" style="overflow-y: scroll; overflow-x: hidden; padding-left: 10px; margin-bottom: 15px">
+                    <div id="sub_traj_table" class="list-group">
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="time_speed_chart"></div>
                 </div>
             </div>
-            <div class="row">
-                <div id="time_speed_chart"></div>
-            </div>
+            
         </div>
     </div>
     <br>

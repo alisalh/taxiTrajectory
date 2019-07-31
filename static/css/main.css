@@ -36,6 +36,9 @@ html, body{
 .right-column{
   flex: 0.8; 
   margin-right: 10px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .control-panel{
@@ -52,6 +55,14 @@ html, body{
 .embedding-panel{
   flex: 2;
   margin-bottom: 10px;
+}
+.search-wrapper{
+  flex: 1;
+  height: 100%;
+}
+.right-column-wrapper{
+  flex: 9;
+  height: 100%;
 }
 
 .col-md-3{
