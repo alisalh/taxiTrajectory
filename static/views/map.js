@@ -774,14 +774,25 @@ function drawDistAndSpeed(dist_data, speed_data){
     d3.select("#time_speed_chart").selectAll("svg").remove();
     var chartSvg = d3.select('#time_speed_chart').append('svg')
         .attr('width', svgWidth).attr('height', svgHeight)
-    // draw circular heat map
+    var innerR = 15, outerR = 30,
+        width = svgWidth/2 - 20, height = svgHeight/2;
+    innerR = drawSpeedChart(speed_data, chartSvg, width, height, innerR, outerR);
+    innerR = drawText(chartSvg, width, height, innerR, innerR+20);
+    drawStackBar(dist_data, chartSvg, width, height, innerR);
+    drawPatterns(chartSvg, width, height);
+    innerR = 15, outerR = 30;
+    drawMark(chartSvg, width, height, innerR, outerR);
+    drawColorBar(chartSvg);  
+}
+
+// draw circular heat map
+function drawSpeedChart(speed_data, chartSvg, width, height, innerR, outerR){
     var color = d3.scaleSequential(d3.interpolateGreens);
     var max = Math.max(...speed_data)
     var arc_speed = d3.arc()
-    var innerR = 20, outerR = 35
     for(var j=0; j<7; j++){
         var speedG = chartSvg.append('g').attr('transform', 
-            'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+            'translate(' + width  + ',' + height +')')
         arc_speed.innerRadius(innerR).outerRadius(outerR)
         var arcs = d3.pie()(new Array(24).fill(1))
         speedG.selectAll('path')
@@ -798,8 +809,11 @@ function drawDistAndSpeed(dist_data, speed_data){
         innerR = outerR
         outerR = outerR + 15
     }
-    
-    // draw stacked bar
+    return innerR
+}
+
+// draw stacked bar
+function drawStackBar(dist_data, chartSvg, width, height, innerR){
     // var dist = []
     // for(var i=0; i<dist_data.length; i++){
     //     for(var j=0; j<dist_data[i].data.length; j++){
@@ -811,6 +825,7 @@ function drawDistAndSpeed(dist_data, speed_data){
     //         })
     //     }  
     // }
+
     var keys = ['0-10km', '10-20km', '20-30km', '>30km'],
         stack = d3.stack().keys(keys);
     var dist = [{}, {}, {}, {}, {}, {}]
@@ -821,12 +836,11 @@ function drawDistAndSpeed(dist_data, speed_data){
     }
     let series = stack(dist)
     var barG = chartSvg.append('g').attr('transform', 
-        'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+        'translate(' + width + ',' + height +')')
     var offset_group = 2*Math.PI / 24 * 3,
-        offest_inner = offset_group / 4,
-        offset_initial = offset_group * 2;
-    innerR = innerR + 20;
-    var color = ['#8dd3c7','#ffffb3','#bebada','#fb8072']
+        offset_initial = offset_group * 2
+        // offest_inner = offset_group / 4
+    var color= d3.scaleSequential(d3.interpolateReds);
     // var arc_dist = d3.arc()
     //     .startAngle(function(d){ return offset_initial + d.time * offset_group + d.id*offest_inner})
     //     .endAngle(function(d){ return offset_initial + d.time * offset_group + (d.id +1)*offest_inner})
@@ -844,15 +858,19 @@ function drawDistAndSpeed(dist_data, speed_data){
     var seriesG = barG.selectAll('g').data(series)
         .enter().append('g')
         .attr('fill', function(d, i){
-            return color[i]
+            let val = d.index * 0.25 + 0.25
+            if(val > 1) val = 1
+            return color(val)
         })
     seriesG.selectAll('g').data(d => d).enter().append('path').attr('d', arc_dist)
-    
-    // add text and split
+}
+
+// add text and split
+function drawText(chartSvg, width, height, innerR, outerR){
     var splitG = chartSvg.append('g').attr('transform', 
-        'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+        'translate(' + width + ',' + height +')')
     var arc = d3.arc()
-        .innerRadius(outerR-15)
+        .innerRadius(outerR)
         .outerRadius(innerR)
     var arcs_split = d3.pie()(new Array(8).fill(1))
     splitG.selectAll('path')
@@ -863,7 +881,7 @@ function drawDistAndSpeed(dist_data, speed_data){
 
     var time = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24']
     var textG = chartSvg.append('g').attr('transform', 
-        'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+        'translate(' + width + ',' + height +')')
     var arcs_text = d3.pie()(new Array(24).fill(1))
     textG.selectAll('path')
         .data(arcs_text).enter().append('path')
@@ -878,15 +896,39 @@ function drawDistAndSpeed(dist_data, speed_data){
         .append('textPath')
         .attr('xlink:href', function(d, i) { return '#text-node-'+i })
         .text(function(d){ return d }) 
-    
-    // add the mark text
+    return outerR
+}
+
+// add patterns
+function drawPatterns(chartSvg, width, height){
+    chartSvg
+        .append('defs')
+        .append('pattern')
+        .attr('id', 'diagonalHatch')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 4)
+        .attr('height', 4)
+        .append('path')
+        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+        .attr('stroke', '#bdbdbd')
+        .attr('stroke-width', 1);
+    var patternG = chartSvg.append('g').attr('transform', 
+        'translate(' + width + ',' + height +')')
+    var arc_pattern = d3.arc().innerRadius(15).outerRadius(15*8)
+        .startAngle(0).endAngle(Math.PI/2)
+    patternG.append('path')
+        .attr('d', arc_pattern)
+        .attr('fill', 'url(#diagonalHatch)');
+}
+
+// add the mark text
+function drawMark(chartSvg, width, height, innerR, outerR){
     var mark = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '>60']
-    innerR = 20, outerR = 35
     for(var i=0; i<7; i++){
         var markG = chartSvg.append('g').attr('transform', 
-            'translate(' + svgWidth / 2 + ',' + svgHeight / 2 +')')
+            'translate(' + width + ',' + height +')')
         var arc_mark = d3.arc().innerRadius(innerR).outerRadius(outerR)
-            .startAngle(0).endAngle(offset_initial)
+            .startAngle(0).endAngle(90)
         markG.append('path')
             .attr('id', 'mark-node-'+i)
             .attr('d', arc_mark)
@@ -900,5 +942,103 @@ function drawDistAndSpeed(dist_data, speed_data){
             .text(mark[i]) 
         innerR = outerR
         outerR = outerR + 15
-    }       
+    } 
+}
+
+// draw color bar 
+function drawColorBar(chartSvg){
+    var color= d3.scaleSequential(d3.interpolateGreens);
+    var speed_bar_G = chartSvg.append('g').attr('transform', 
+        'translate(' + 300 + ',' + 0 +')')
+    let linearGradient = chartSvg .append('defs')
+        .append('linearGradient')
+        .attr('id', 'bar-linear-gradient')
+        .attr('gradientUnits','userSpaceOnUse')
+        .attr('x1', 0)
+        .attr('y1', 0)
+        .attr('x2', 150)
+        .attr('y2', 15)
+    linearGradient.append('stop')
+        .attr('offset', '0%')
+        .attr('stop-color', color(0.1))
+    linearGradient.append('stop')
+        .attr('offset', '100%')
+        .attr('stop-color', color(0.9))
+    speed_bar_G.append('text')
+        .text('Num')
+        .attr('font-size', 12)
+        .attr('dy', '1em')
+        .attr('dx', '-2.5em')
+    speed_bar_G.append('rect')
+        .attr('width', 150)
+        .attr('height', 15)
+        .style('fill', 'url(#bar-linear-gradient)')
+    speed_bar_G.append('text')
+        .text('Less')
+        .attr('font-size', 10)
+        .attr('dy', '2.5em')
+    speed_bar_G.append('text')
+        .text('More')
+        .attr('font-size', 10)
+        .attr('x', 150)
+        .attr('dx', '-1.8em')
+        .attr('dy', '2.5em')
+
+    color= d3.scaleSequential(d3.interpolateReds);
+    var dist_bar_G = chartSvg.append('g').attr('transform', 
+        'translate(' + 300 + ',' + 30 +')')
+    dist_bar_G.append('rect')
+        .attr('width', 150/4)
+        .attr('height', 15)
+        .attr('fill', color(0.25))
+    dist_bar_G.append('rect')
+        .attr('width', 150/4)
+        .attr('height', 15)
+        .attr('fill', color(0.5))
+        .attr('x', 150/4)
+    dist_bar_G.append('rect')
+        .attr('width', 150/4)
+        .attr('height', 15)
+        .attr('fill', color(0.75))
+        .attr('x', 150/2)
+    dist_bar_G.append('rect')
+        .attr('width', 150/4)
+        .attr('height', 15)
+        .attr('fill', color(1))
+        .attr('x', 150*3/4)
+    dist_bar_G.append('text')
+        .text('Dist')
+        .attr('font-size', 12)
+        .attr('dy', '1em')
+        .attr('dx', '-2.3em')
+    dist_bar_G.append('text')
+        .text('0')
+        .attr('font-size', 10)
+        .attr('x', 0)
+        .attr('dx', '-0.3em')
+        .attr('dy', '2.5em')
+    dist_bar_G.append('text')
+        .text('10')
+        .attr('font-size', 10)
+        .attr('x', 150/4)
+        .attr('dx', '-0.3em')
+        .attr('dy', '2.5em')
+    dist_bar_G.append('text')
+        .text('20')
+        .attr('font-size', 10)
+        .attr('x', 150/2)
+        .attr('dx', '-0.3em')
+        .attr('dy', '2.5em')
+    dist_bar_G.append('text')
+        .text('30')
+        .attr('font-size', 10)
+        .attr('x', 150*3/4)
+        .attr('dx', '-0.3em')
+        .attr('dy', '2.5em')
+    dist_bar_G.append('text')
+        .text('More')
+        .attr('font-size', 10)
+        .attr('x', 150)
+        .attr('dx', '-0.3em')
+        .attr('dy', '2.5em')
 }
