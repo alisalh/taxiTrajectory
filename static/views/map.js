@@ -14,7 +14,7 @@ var mapchart = echarts.init(dom);
 var app = {};
 var map_line_width = 4;
 var map_lines_data = null;
-var map_points_data = null;
+var map_arrows_data = null;
 var map_lines_data_new = null;
 var embedding_data = null;
 var table_data = null;
@@ -87,6 +87,13 @@ var map_option = {
             polyline: true,
             zlevel: 2,
             animation: false,  
+            // effect: {
+            //     show: true,
+            //     period: 20,
+            //     trailLength: 0,
+            //     symbol: 'arrow',
+            //     symbolSize: 10
+            // },
             emphasis: {
                 lineStyle: {
                     color: '#9e0142'
@@ -99,16 +106,8 @@ var map_option = {
             polyline: true,
             zlevel: 1,
             animation: false,
-            symbol: ['none','arrow'],
+            symbol: 'arrow',
             symbolSize: 5,
-
-            effect: {
-                show: true,
-                period: 50,
-                trailLength: 0,
-                symbol: 'arrow',
-                symbolSize: 4
-            },
             emphasis: {
                 lineStyle: {
                     color: '#1f78b4'
@@ -122,18 +121,7 @@ var map_option = {
             animation: false,
             symbol: ['none', 'arrow'],
             symbolSize: 10
-        },
-        {
-            type: 'scatter',
-            coordinateSystem: 'leaflet',
-            zlevel: 4,
-            animation: false,
-            symbol: 'arrow',
-            symbolSize: 10,
-            tooltip:{
-                show: false
-            }
-        },
+        }
     ]
 };
 map_option = $.extend(map_option, bmap_option);
@@ -241,64 +229,46 @@ function update_topic_region(lines_data) {
     }
     map_lines_data = lines;
     map_option.series[0].data = lines;
-    var new_lines = [], points = []
+    var arrows = []
     for(var i=0; i<lines.length; i++){
-        var j = lines[i].coords.length
-        if(j >=2 ) {
-            j = Math.floor(j/2)
-            // var temp = {'coords': [lines[i].coords[j], lines[i].coords[j+1]],       'id': lines[i].id, 
-            // 'lineStyle': lines[i].lineStyle, 
-            // 'index': lines[i].index}
-            // new_lines.push(temp)
-            points.push({
-                'coords': lines[i].coords[j], 
-                'color': topic_colors[lines_data[i][1]],
-                'angle': getAngle(lines[i].coords[j], lines[i].coords[j+1]),
-                'opacity': lines[i].lineStyle.normal.opacity
-            })
-
-        }  
-    }
-    // map_option.series[2].data = new_lines;
-    map_option.series[3].data = points.map(function(d){
-        return { value: d.coords,
-                symbolRotate: d.angle,
-                itemStyle:{
-                    normal:{
-                        color:d.color,
-                        opacity: d.opacity
-                    }
-                }
-
+        var max_dist = 0, index = 0
+        for(var j=0; j<lines[i].coords.length-1; j++){
+            var dist = getDist(lines[i].coords[j], lines[i].coords[j+1])
+            if(dist > max_dist){
+                max_dist = dist
+                index = j
+            }
         }
-    })
-    map_points_data = points
+        var arrow = {
+            'coords': [lines[i].coords[index], lines[i].coords[index+1]],       
+            'id': lines[i].id, 
+            'lineStyle': {
+                "normal": {
+                    "color": lines[i].lineStyle.normal.color,
+                    "width": 0,
+                    'opacity': lines[i].lineStyle.normal.opacity
+                }
+            }, 
+            'index': lines[i].index
+        }
+        arrows.push(arrow) 
+    }
+    map_option.series[2].data = arrows;
+    map_arrows_data = arrows
     mapchart.setOption(map_option, true);
 }
 
-function getAngle(pre, next){
-    var angle
-    if(next[1] > 0){
-        if(next[0] > 0){
-            angle = Math.atan((next[0]-pre[0])/(next[1]-pre[1]))
-            angle = -angle*180/Math.PI
-        }
-        else{
-            angle = Math.atan((pre[0]-next[0])/(next[1]-pre[1]))
-            angle = angle*180/Math.PI
-        }
-    }
-    else{
-        if(next[0] > 0){
-            angle = Math.atan((next[1]-pre[1])/(next[0]-pre[0]))
-            angle = -90-angle*180/Math.PI
-        }
-        else{
-            angle = Math.atan((next[1]-pre[1])/(pre[0]-next[0]))
-            angle = 90+angle*180/Math.PI
-        }
-    }
-    return angle;
+function Rad(d){
+    return d * Math.PI / 180;
+}
+
+function getDist(pre, next){
+    var lat1 = pre[0], lng1 = pre[1], lat2 = next[0], lng2 = next[1];
+    var a = Rad(lat1) - Rad(lat2), b = Rad(lng1) - Rad(lng2);
+    var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) +                  Math.cos(Rad(lat1))*Math.cos(Rad(lat2))*Math.pow(Math.sin(b/2),2)));
+    s = s*6378.137;
+    s = Math.round(s * 10000) / 10000;
+    return s
 }
 
 // 获取距离, 创建子路径table
@@ -361,41 +331,16 @@ function update_by_topics() {
         }
         var lines_new = [];
         var table_data_new = [];
-        var points_new = [];
+        var arrows_new = []
         for(var i=0;i<indexes.length;i++){
             phrase_embedding_data[indexes[i]][3] = 1.0;
             table_data_new.push(table_data[indexes[i]]);
             lines_new.push(map_lines_data[indexes[i]]);
-            points_new.push(map_points_data[indexes[i]]);
+            arrows_new.push(map_arrows_data[indexes[i]]);
         }
         map_option.series[0].data = lines_new;
         map_lines_data_new = lines_new;
-        map_option.series[3].data = points_new.map(function(d){
-            return { value: d.coords,
-                    symbolRotate: d.angle,
-                    itemStyle:{
-                        normal:{
-                            color:d.color,
-                            opacity: d.opacity
-                        }
-                    }
-    
-            }
-        })
-        // var new_lines = []
-        // for(var i=0; i<lines_new.length; i++){
-        //     var j = lines_new[i].coords.length
-        //     if(j >=2 ) {
-        //         j = Math.floor(j/2)
-        //         var temp = {'coords': [lines_new[i].coords[j], lines_new[i].coords[j+1]],       
-        //         'id': lines_new[i].id, 
-        //         'lineStyle': lines_new[i].lineStyle, 
-        //         'index': lines_new[i].index
-        //     }
-        //     new_lines.push(temp)
-        //     }
-        // }
-        // map_option.series[2].data = new_lines;
+        map_option.series[2].data = arrows_new;
 
         mapchart.setOption(map_option, true);
 
@@ -643,12 +588,6 @@ function renderBrushed(params) {
     }
 
 }
-
-var time_speed_chart = circularHeatChart()
-    .numSegments(24)
-    .range(["#1a9641", "#a6d96a", "#ffffbf", "#fdae61", "#d7191c"])
-    .radialLabels(["0-9", "10-19", "20-29", "30-39", "40-49", "50-59", ">60"])
-    .segmentLabels(["0", '1', '2', '3', '4', '5', "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" ]);
 
 var sub_traj_height = wrapper_height * 0.5;
 $("#sub_traj_table").parent().height(sub_traj_height);
