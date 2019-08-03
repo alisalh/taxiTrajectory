@@ -12,8 +12,9 @@ var dom = document.getElementById("map");
 var selected_topics = [];
 var mapchart = echarts.init(dom);
 var app = {};
-var map_line_width = 20;
+var map_line_width = 4;
 var map_lines_data = null;
+var map_points_data = null;
 var map_lines_data_new = null;
 var embedding_data = null;
 var table_data = null;
@@ -23,6 +24,7 @@ var time_speed_height = height * 0.351;
 var time_dist_data_bk = null;
 var time_speed_data_bk = null;
 
+// 地图上的重载按钮
 var bmap_option = {
     tooltip: {},
     toolbox: {
@@ -83,17 +85,8 @@ var map_option = {
             type: 'lines',
             coordinateSystem: 'leaflet',
             polyline: true,
-            zlevel: 20,
-            animation: false,
-            symbol: 'arrow',
-            symbolSize: 12,
-            effect: {
-                show: true,
-                period: 50,
-                trailLength: 0,
-                symbol: 'arrow',
-                symbolSize: 10
-            },
+            zlevel: 2,
+            animation: false,  
             emphasis: {
                 lineStyle: {
                     color: '#9e0142'
@@ -104,9 +97,9 @@ var map_option = {
             type: 'lines',
             coordinateSystem: 'leaflet',
             polyline: true,
-            zlevel: 10,
+            zlevel: 1,
             animation: false,
-            symbol: 'arrow',
+            symbol: ['none','arrow'],
             symbolSize: 5,
 
             effect: {
@@ -123,11 +116,24 @@ var map_option = {
             }
         },
         {
+            type: 'lines',
+            coordinateSystem: 'leaflet',
+            zlevel: 3,
+            animation: false,
+            symbol: ['none', 'arrow'],
+            symbolSize: 10
+        },
+        {
             type: 'scatter',
             coordinateSystem: 'leaflet',
-            zlevel: 2,
-            symbolSize: 0
-        }
+            zlevel: 4,
+            animation: false,
+            symbol: 'arrow',
+            symbolSize: 10,
+            tooltip:{
+                show: false
+            }
+        },
     ]
 };
 map_option = $.extend(map_option, bmap_option);
@@ -136,7 +142,6 @@ $("#map").dblclick(map_interactive_change, function () {
     map_interactive_change();
 });
 function map_interactive_change() {
-    // map_option.leaflet.roam = !map_option.leaflet.roam;
     var roam = map_option.leaflet.roam;
     var leaflet = map_coords[map_id].getLeaflet();
     if (roam && roam !== 'move') {
@@ -160,7 +165,8 @@ var topic_bar_option = {
         trigger: 'axis',
         axisPointer : {            // 坐标轴指示器，坐标轴触发有效
             type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-        }
+        },
+        showContent: false
     },
     grid: {
         left: '1%',
@@ -226,20 +232,73 @@ function update_topic_region(lines_data) {
         lines.push({
             "coords": coords, index: lines_data[i][10], "id": lines_data[i][3], "lineStyle": {
                 "normal": {
-                    "color": topic_colors[lines_data[i][1]], //"opacity": 0.6,
-                    "width": Math.sqrt(lines_data[i][2]) * map_line_width,
-                    'opacity': 0.5
+                    "color": topic_colors[lines_data[i][1]],
+                    "width": map_line_width,
+                    'opacity': lines_data[i][2]*100
                 }
             }
         });
     }
-
     map_lines_data = lines;
-
     map_option.series[0].data = lines;
-    var map_center_scatter = lines_data.map(function (d) {return d[8]});
-    map_option.series[2].data = map_center_scatter;
+    var new_lines = [], points = []
+    for(var i=0; i<lines.length; i++){
+        var j = lines[i].coords.length
+        if(j >=2 ) {
+            j = Math.floor(j/2)
+            // var temp = {'coords': [lines[i].coords[j], lines[i].coords[j+1]],       'id': lines[i].id, 
+            // 'lineStyle': lines[i].lineStyle, 
+            // 'index': lines[i].index}
+            // new_lines.push(temp)
+            points.push({
+                'coords': lines[i].coords[j], 
+                'color': topic_colors[lines_data[i][1]],
+                'angle': getAngle(lines[i].coords[j], lines[i].coords[j+1]),
+                'opacity': lines[i].lineStyle.normal.opacity
+            })
+
+        }  
+    }
+    // map_option.series[2].data = new_lines;
+    map_option.series[3].data = points.map(function(d){
+        return { value: d.coords,
+                symbolRotate: d.angle,
+                itemStyle:{
+                    normal:{
+                        color:d.color,
+                        opacity: d.opacity
+                    }
+                }
+
+        }
+    })
+    map_points_data = points
     mapchart.setOption(map_option, true);
+}
+
+function getAngle(pre, next){
+    var angle
+    if(next[1] > 0){
+        if(next[0] > 0){
+            angle = Math.atan((next[0]-pre[0])/(next[1]-pre[1]))
+            angle = -angle*180/Math.PI
+        }
+        else{
+            angle = Math.atan((pre[0]-next[0])/(next[1]-pre[1]))
+            angle = angle*180/Math.PI
+        }
+    }
+    else{
+        if(next[0] > 0){
+            angle = Math.atan((next[1]-pre[1])/(next[0]-pre[0]))
+            angle = -90-angle*180/Math.PI
+        }
+        else{
+            angle = Math.atan((next[1]-pre[1])/(pre[0]-next[0]))
+            angle = 90+angle*180/Math.PI
+        }
+    }
+    return angle;
 }
 
 // 获取距离, 创建子路径table
@@ -302,13 +361,42 @@ function update_by_topics() {
         }
         var lines_new = [];
         var table_data_new = [];
+        var points_new = [];
         for(var i=0;i<indexes.length;i++){
             phrase_embedding_data[indexes[i]][3] = 1.0;
             table_data_new.push(table_data[indexes[i]]);
             lines_new.push(map_lines_data[indexes[i]]);
+            points_new.push(map_points_data[indexes[i]]);
         }
         map_option.series[0].data = lines_new;
         map_lines_data_new = lines_new;
+        map_option.series[3].data = points_new.map(function(d){
+            return { value: d.coords,
+                    symbolRotate: d.angle,
+                    itemStyle:{
+                        normal:{
+                            color:d.color,
+                            opacity: d.opacity
+                        }
+                    }
+    
+            }
+        })
+        // var new_lines = []
+        // for(var i=0; i<lines_new.length; i++){
+        //     var j = lines_new[i].coords.length
+        //     if(j >=2 ) {
+        //         j = Math.floor(j/2)
+        //         var temp = {'coords': [lines_new[i].coords[j], lines_new[i].coords[j+1]],       
+        //         'id': lines_new[i].id, 
+        //         'lineStyle': lines_new[i].lineStyle, 
+        //         'index': lines_new[i].index
+        //     }
+        //     new_lines.push(temp)
+        //     }
+        // }
+        // map_option.series[2].data = new_lines;
+
         mapchart.setOption(map_option, true);
 
         phrase_embedding_option.series[0].data = phrase_embedding_data;
@@ -627,10 +715,10 @@ function create_sub_trajectory_table(table_data, sort_index) {
         support_svg.append("rect").attr("y", 28).attr("x", "220px").attr("width", table_data[i][colum_index[4]]*10)
             .attr("fill", "#fc8d59").attr("height", "14");
 
-
         tr[i].appendChild(meta_name);
 
-        tr[i].addEventListener("click", function () {
+        tr[i].addEventListener("click", function () { 
+            $(this).css({"background": "#969696"});
             var id_value = $(this).attr('id');
             var field_values = id_value.split("_");
             var centre = map_lines_data[parseInt(field_values[1])]['coords'];
@@ -976,12 +1064,13 @@ function drawColorBar(chartSvg){
     speed_bar_G.append('text')
         .text('Less')
         .attr('font-size', 10)
+        .attr('dx', '-0.3em')
         .attr('dy', '2.5em')
     speed_bar_G.append('text')
         .text('More')
         .attr('font-size', 10)
         .attr('x', 150)
-        .attr('dx', '-1.8em')
+        .attr('dx', '-0.3em')
         .attr('dy', '2.5em')
 
     color= d3.scaleSequential(d3.interpolateReds);
