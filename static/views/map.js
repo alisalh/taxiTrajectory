@@ -327,7 +327,7 @@ function update_by_topics() {
         var indexes = jsondata.data.search;
         var phrase_embedding_data = embedding_data;
         for(var pei=0;pei<phrase_embedding_data.length;pei++){
-            phrase_embedding_data[pei][3] = 0.2;
+            phrase_embedding_data[pei][3] = 0.1;
         }
         var lines_new = [];
         var table_data_new = [];
@@ -347,6 +347,7 @@ function update_by_topics() {
         phrase_embedding_option.series[0].data = phrase_embedding_data;
         phrase_embedding_chart.setOption(phrase_embedding_option, true);
         create_sub_trajectory_table(table_data_new, null);
+
         //////////
         //////////////////////
         var time_dist_data = jsondata.data.time_dist;
@@ -480,7 +481,7 @@ var phrase_embedding_option = {
     },
     series: [{
         symbolSize: function (params) {
-            return Math.sqrt(params[6])*40;
+            return Math.sqrt(params[6])*25;
         },
         type: 'scatter'
     }],
@@ -547,12 +548,14 @@ function renderBrushed(params) {
     if(bool_scatter_move_in_event || bool_scatter_move_out_event){
         var brushComponent = params.batch[0];
         var new_brush_data = [];
+        var new_arrows = [];
         var new_brush_table_index_data = [];
         for (var sIdx = 0; sIdx < brushComponent.selected.length; sIdx++) {
             var rawIndices = brushComponent.selected[sIdx].dataIndex;
             for(var j =0; j<rawIndices.length;j++){
                 if(selected_topics.indexOf(embedding_data[rawIndices[j]][2]) !== -1){
                     new_brush_data.push(map_lines_data[rawIndices[j]]);
+                    new_arrows.push(map_arrows_data[rawIndices[j]]);
                     new_brush_table_index_data.push(rawIndices[j]);
                 }
             }
@@ -562,6 +565,7 @@ function renderBrushed(params) {
             new_brush_table_index_data = null;
         }else {
             map_option.series[0].data = new_brush_data;
+            map_option.series[2].data = new_arrows;
         }
         if(new_brush_data.length !== 0){
             $.post('/getdetailbyid/', {"id": JSON.stringify(new_brush_table_index_data)}, function (jsondata) {
@@ -577,7 +581,7 @@ function renderBrushed(params) {
                     }
                     time_speed_data.push(old_time_speed_data[i]);
                 }
-                drawDistAndSpeed(time_dist_data, time_speed_data)
+                drawDistAndSpeed(start_time_span_data, time_speed_data)
             });
         }else{
             drawDistAndSpeed(time_dist_data_bk, time_speed_data_bk)
@@ -588,7 +592,7 @@ function renderBrushed(params) {
     }
 
 }
-
+// var line_data = [], arrow_data = []
 var sub_traj_height = wrapper_height * 0.5;
 $("#sub_traj_table").parent().height(sub_traj_height);
 function create_sub_trajectory_table(table_data, sort_index) {
@@ -608,16 +612,26 @@ function create_sub_trajectory_table(table_data, sort_index) {
             continue
         };
         var road_name_list = document.createElement('div');
-        for (var j = 0; j < table_data[i][colum_index[0]].length; j++) {
+
+        //过滤相邻同名字段
+        var temp_raod_name = table_data[i][colum_index[0]][0]
+        var new_road_name_list = [temp_raod_name]
+        for (var t=1; t<table_data[i][colum_index[0]].length; t++){
+            if(temp_raod_name === table_data[i][colum_index[0]][t])
+                continue
+            temp_raod_name = table_data[i][colum_index[0]][t]
+            new_road_name_list.push(temp_raod_name)
+        }
+        for (var j = 0; j < new_road_name_list.length; j++) {
             var road_name = document.createElement('p');
             road_name.classList.add("label");
             road_name.style['background-color'] = topic_colors[table_data[i][colum_index[1]]];
             road_name.style.color = 'white';
             road_name.style['font-size'] = '11px';
-            var road_name_text = document.createTextNode(table_data[i][colum_index[0]][j]);
+            var road_name_text = document.createTextNode(new_road_name_list[j]);
             road_name.appendChild(road_name_text);
             road_name_list.appendChild(road_name);
-            if (j !== table_data[i][colum_index[0]].length - 1) {
+            if (j !== new_road_name_list.length - 1) {
                 var arrow = document.createElement('span');
                 arrow.classList.add("glyphicon");
                 arrow.classList.add("glyphicon-arrow-right");
@@ -655,7 +669,6 @@ function create_sub_trajectory_table(table_data, sort_index) {
             .attr("fill", "#fc8d59").attr("height", "14");
 
         tr[i].appendChild(meta_name);
-
         tr[i].addEventListener("click", function () { 
             $(this).css({"background": "#969696"});
             var id_value = $(this).attr('id');
@@ -670,8 +683,13 @@ function create_sub_trajectory_table(table_data, sort_index) {
             var x_mean = x_sum/centre.length;
             var y_mean = y_sum/centre.length;
             update_detail(parseInt(field_values[0]), parseInt(field_values[1]), [x_mean, y_mean]);
+            // line_data.push(map_lines_data.filter(d => d.id === parseInt(field_values[0]))[0])
+            // arrow_data.push(map_arrows_data.filter(d => d.id === parseInt(field_values[0]))[0])
+            // map_option.series[0].data = line_data;
+            // map_option.series[2].data = arrow_data;
         });
         table.appendChild(tr[i]);
+        
     }
 }
 
@@ -732,7 +750,7 @@ function update_detail_by_ids(data_ids, centre) {
         if(centre !== null){
             map_option.leaflet.center = centre;
         }
-        map_option.series[1].data = ext_lines;
+        // map_option.series[1].data = ext_lines;
         mapchart.setOption(map_option, true);
 
         create_table(table_data);
@@ -809,7 +827,7 @@ function drawDistAndSpeed(dist_data, speed_data){
     drawPatterns(chartSvg, width, height);
     innerR = 15, outerR = 30;
     drawMark(chartSvg, width, height, innerR, outerR);
-    drawColorBar(chartSvg);  
+    // drawColorBar(chartSvg);  
 }
 
 // draw circular heat map
@@ -906,7 +924,7 @@ function drawText(chartSvg, width, height, innerR, outerR){
             .attr('d', arc)
             .attr('stroke', '#d9d9d9')
 
-    var time = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24']
+    var time = ['12am','1','2','3','4','5','6','7','8','9','10','11','12pm','1','2','3','4','5','6','7','8','9','10','11']
     var textG = chartSvg.append('g').attr('transform', 
         'translate(' + width + ',' + height +')')
     var arcs_text = d3.pie()(new Array(24).fill(1))
@@ -950,7 +968,7 @@ function drawPatterns(chartSvg, width, height){
 
 // add the mark text
 function drawMark(chartSvg, width, height, innerR, outerR){
-    var mark = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '>60']
+    var mark = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '>60 km/h']
     for(var i=0; i<7; i++){
         var markG = chartSvg.append('g').attr('transform', 
             'translate(' + width + ',' + height +')')
@@ -1040,25 +1058,25 @@ function drawColorBar(chartSvg){
         .attr('dy', '1em')
         .attr('dx', '-2.3em')
     dist_bar_G.append('text')
-        .text('0')
+        .text('0km')
         .attr('font-size', 10)
         .attr('x', 0)
         .attr('dx', '-0.3em')
         .attr('dy', '2.5em')
     dist_bar_G.append('text')
-        .text('10')
+        .text('10km')
         .attr('font-size', 10)
         .attr('x', 150/4)
         .attr('dx', '-0.3em')
         .attr('dy', '2.5em')
     dist_bar_G.append('text')
-        .text('20')
+        .text('20km')
         .attr('font-size', 10)
         .attr('x', 150/2)
         .attr('dx', '-0.3em')
         .attr('dy', '2.5em')
     dist_bar_G.append('text')
-        .text('30')
+        .text('30km')
         .attr('font-size', 10)
         .attr('x', 150*3/4)
         .attr('dx', '-0.3em')
